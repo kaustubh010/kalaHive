@@ -18,6 +18,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/hooks/use-auth";
+import { supabase } from "@/utils/supabase/client";
 
 export function SignupForm() {
   const router = useRouter();
@@ -37,6 +38,8 @@ export function SignupForm() {
     try {
       const { error } = await signInWithGoogle();
       if (error) throw error;
+      // Google sign-in will redirect to the auth callback route
+      // which will handle the redirection to onboarding or dashboard
     } catch (error: any) {
       setError(error.message || "An error occurred during Google sign in.");
     }
@@ -66,12 +69,32 @@ export function SignupForm() {
     }
     
     try {
+      // Sign up the user
       const { error, user } = await signUp(email, password, name);
-
       if (error) throw error;
       
-      // If signup is successful, redirect to onboarding
-      router.push("/onboarding/user-type");
+      if (user) {
+        // Ensure the profile has onboardingCompleted set to false
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({ onboardingCompleted: false })
+          .eq('id', user.id);
+          
+        if (updateError) {
+          console.error('Error updating profile:', updateError);
+        }
+        
+        // Sign in the user immediately after signup
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
+        
+        if (signInError) throw signInError;
+        
+        // Redirect to onboarding
+        router.push("/onboarding/user-type");
+      }
     } catch (error: any) {
       setError(error.message || "An error occurred during sign up.");
       setLoading(false);

@@ -18,6 +18,7 @@ import {
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { supabase } from "@/utils/supabase/client";
 
 export function LoginForm() {
   const router = useRouter();
@@ -50,8 +51,27 @@ export function LoginForm() {
       
       if (error) throw new Error(error.message);
       
-      // Let the auth state change handler in the login page handle the redirect
-      // This avoids race conditions with the auth state
+      // Check if the user has completed onboarding
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (user) {
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('onboardingCompleted')
+          .eq('id', user.id)
+          .single();
+          
+        if (!profileError && profile) {
+          if (profile.onboardingCompleted === false) {
+            // Redirect to onboarding if not completed
+            router.push('/onboarding/user-type');
+            return;
+          }
+        }
+      }
+      
+      // Redirect to dashboard if onboarding is completed
+      router.push('/dashboard');
     } catch (error: any) {
       setError(error.message || "An error occurred during sign in.");
       setLoading(false);
@@ -66,7 +86,8 @@ export function LoginForm() {
       const { error } = await signInWithGoogle();
       
       if (error) throw new Error(error.message);
-      // Let the auth state change handler handle the redirect
+      // Google sign-in will redirect to the auth callback route
+      // which will handle the redirection to onboarding or dashboard
     } catch (error: any) {
       setError(error.message || "An error occurred during Google sign in.");
       setLoading(false);
@@ -107,9 +128,9 @@ export function LoginForm() {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label htmlFor="password">Password</Label>
-              <Link 
-                href="/auth/forgot-password" 
-                className="text-sm text-primary hover:underline"
+              <Link
+                href="/auth/forgot-password"
+                className="text-xs text-primary hover:underline"
               >
                 Forgot password?
               </Link>
@@ -126,7 +147,14 @@ export function LoginForm() {
           </div>
           
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Signing in..." : "Sign In"}
+            {loading ? (
+              <div className="flex items-center gap-2">
+                <div className="h-4 w-4 border-t-2 border-b-2 border-current animate-spin rounded-full" />
+                Signing in...
+              </div>
+            ) : (
+              "Sign In"
+            )}
           </Button>
         </form>
         

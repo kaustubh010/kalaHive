@@ -437,7 +437,7 @@ export default function SettingsPage() {
                     <div>
                       <p className="text-sm font-medium mb-1">Account Created</p>
                       <p className="text-sm text-muted-foreground">
-                        {profile?.createdAt ? new Date(profile.createdAt).toLocaleDateString() : "Unknown"}
+                        {profile?.created_at ? new Date(profile.created_at).toLocaleDateString() : "Unknown"}
                       </p>
                     </div>
                   </div>

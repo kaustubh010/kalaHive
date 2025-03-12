@@ -128,16 +128,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
+    // Initialize auth state immediately from localStorage if available
+    const cachedUser = localStorage.getItem('auth_user');
+    const cachedProfile = localStorage.getItem('auth_profile');
+    
+    if (cachedUser) {
+      try {
+        setUser(JSON.parse(cachedUser));
+        if (cachedProfile) {
+          setProfile(JSON.parse(cachedProfile));
+        }
+        // Still loading but we have something to show
+        setLoading(true);
+      } catch (e) {
+        console.error('Error parsing cached auth data:', e);
+      }
+    }
+
     const initializeAuth = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         
         if (session?.user) {
           setUser(session.user);
+          // Cache user in localStorage
+          localStorage.setItem('auth_user', JSON.stringify(session.user));
+          
+          // Fetch profile
           await handleUserProfile(session.user);
         } else {
           setUser(null);
           setProfile(null);
+          // Clear cache
+          localStorage.removeItem('auth_user');
+          localStorage.removeItem('auth_profile');
         }
       } catch (error) {
         console.error('Error initializing auth:', error);
@@ -147,20 +171,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     };
 
-    if (!initialized) {
-      initializeAuth();
-    }
+    initializeAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log('Auth state change:', event, session?.user?.id);
+        
         if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
           if (session?.user) {
             setUser(session.user);
+            // Cache user in localStorage
+            localStorage.setItem('auth_user', JSON.stringify(session.user));
+            
             await handleUserProfile(session.user);
           }
         } else if (event === 'SIGNED_OUT') {
           setUser(null);
           setProfile(null);
+          // Clear cache
+          localStorage.removeItem('auth_user');
+          localStorage.removeItem('auth_profile');
         }
       }
     );
@@ -168,7 +198,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => {
       subscription.unsubscribe();
     };
-  }, [initialized]);
+  }, []);
+
+  // Cache profile when it changes
+  useEffect(() => {
+    if (profile) {
+      localStorage.setItem('auth_profile', JSON.stringify(profile));
+    }
+  }, [profile]);
 
   const signIn = async (email: string, password: string) => {
     try {
@@ -187,9 +224,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signInWithGoogle = async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const isExistingUser = !!session?.user;
-      
+      // Always redirect to the auth callback route
       const redirectTo = `${window.location.origin}/auth/callback`;
       
       const { error } = await supabase.auth.signInWithOAuth({
@@ -241,6 +276,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(null);
       setProfile(null);
       
+      // Clear cache
+      localStorage.removeItem('auth_user');
+      localStorage.removeItem('auth_profile');
+      
       const { error } = await supabase.auth.signOut();
       return { error };
     } catch (error) {
@@ -284,11 +323,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     updatePassword,
   };
 
-  // Don't render children until initial load is complete
-  if (!initialized) {
-    return null;
-  }
-
+  // Always render children, but with potentially cached data
+  // This prevents the blank screen issue
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
