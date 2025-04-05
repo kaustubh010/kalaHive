@@ -1,10 +1,10 @@
 "use client";
 
-import { TopArtists } from "@/components/top-artists";
 import { PlatformSection } from "@/components/platform-section";
 import { ArtisticHero } from "@/components/artistic-hero";
 import { TopArts } from "@/components/top-arts";
 import { Navbar } from "@/components/navbar";
+import { Footer } from "@/components/footer";
 
 export default function Home() {
   return (
@@ -17,6 +17,7 @@ export default function Home() {
           <PlatformSection />
         </div>
       </main>
+      <Footer/>
     </div>
   );
 }
