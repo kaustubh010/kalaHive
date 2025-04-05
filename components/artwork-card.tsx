@@ -68,7 +68,7 @@ export function ArtworkCard({ artwork }: ArtworkCardProps) {
         .toUpperCase()
         .substring(0, 2);
     }
-    return "AR"; // Art Realm default
+    return "KH"; // Kala Hive default
   };
 
   const handleArtistClick = (e: React.MouseEvent) => {

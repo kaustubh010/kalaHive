@@ -105,7 +105,7 @@ export default function ArtistProfilePage({ params }: { params: Promise<{ userna
         .toUpperCase()
         .substring(0, 2);
     }
-    return "AR"; // Art Realm default
+    return "KH"; // Kala Hive default
   };
 
   if (error) {

@@ -51,10 +51,8 @@ export function Navbar() {
 
   const navLinks = [
     { href: "/explore", label: "Explore", icon: <Search className="h-4 w-4 mr-2" /> },
-    { href: "/artists", label: "Artists", icon: <Palette className="h-4 w-4 mr-2" /> },
-    { href: "/marketplace", label: "Marketplace", icon: <ShoppingBag className="h-4 w-4 mr-2" /> },
-    { href: "/about", label: "About", icon: <Info className="h-4 w-4 mr-2" /> },
-    { href: "/contact", label: "Contact", icon: <Mail className="h-4 w-4 mr-2" /> },
+    { href: "/", label: "Dashboard", icon: <User className="h-4 w-4 mr-2" /> },
+    { href: "/upload", label: "Upload", icon: <Upload className="h-4 w-4 mr-2" /> },
   ];
 
   // Function to navigate and close mobile menu
@@ -72,7 +70,7 @@ export function Navbar() {
               <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
                 <GalleryVerticalEnd className="size-4" />
               </div>
-              <span className="hidden sm:inline">Art Realm</span>
+              <span className="hidden sm:inline">Kala Hive</span>
             </Link>
           </div>
 
@@ -122,7 +120,7 @@ export function Navbar() {
                       </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => router.push("/dashboard")}>
+                    <DropdownMenuItem onClick={() => router.push("/")}>
                       <User className="mr-2 h-4 w-4" />
                       <span>Dashboard</span>
                     </DropdownMenuItem>
@@ -245,7 +243,7 @@ export function Navbar() {
                             <Button 
                               variant="ghost" 
                               className="w-full justify-start" 
-                              onClick={() => router.push("/dashboard")}
+                              onClick={() => router.push("/")}
                             >
                               <User className="mr-2 h-4 w-4" />
                               Dashboard

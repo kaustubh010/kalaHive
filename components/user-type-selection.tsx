@@ -64,7 +64,7 @@ export function UserTypeSelection() {
     <div className="w-full max-w-3xl">
       <Card className="border-border/50 bg-background/80 backdrop-blur-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">How will you use Art Realm?</CardTitle>
+          <CardTitle className="text-2xl">How will you use Kala Hive?</CardTitle>
           <CardDescription>
             Select your primary role to personalize your experience
           </CardDescription>

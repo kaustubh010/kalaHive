@@ -214,7 +214,7 @@ export function ArtUploadForm() {
       <CardHeader>
         <CardTitle>Upload Your Artwork</CardTitle>
         <CardDescription>
-          Share your creative work with the Art Realm community
+          Share your creative work with the Kala Hive community
         </CardDescription>
       </CardHeader>
       <CardContent>

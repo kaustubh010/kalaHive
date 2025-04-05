@@ -3,15 +3,22 @@
 import { TopArtists } from "@/components/top-artists";
 import { PlatformSection } from "@/components/platform-section";
 import { ArtisticHero } from "@/components/artistic-hero";
-import { MainLayout } from "@/components/main-layout";
+import { TopArts } from "@/components/top-arts";
+import { Footer } from "@/components/footer";
 
 export default function Home() {
   return (
-    <MainLayout>
-      <ArtisticHero />
-      <TopArtists />
-      <PlatformSection />
-    </MainLayout>
+    <div className="flex flex-col min-h-screen">
+      <main className="flex-grow">
+        <ArtisticHero />
+        <div className="container py-16 space-y-24">
+          <TopArtists />
+          <TopArts />
+          <PlatformSection />
+        </div>
+      </main>
+      <Footer />
+    </div>
   );
 }
 

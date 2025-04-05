@@ -59,7 +59,7 @@ export default function ForgotPasswordPage() {
             <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
               <GalleryVerticalEnd className="size-4" />
             </div>
-            Art Realm
+            Kala Hive
           </Link>
         </div>
       </header>

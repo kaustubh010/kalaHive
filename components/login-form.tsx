@@ -71,7 +71,7 @@ export function LoginForm() {
       }
       
       // Redirect to dashboard if onboarding is completed
-      router.push('/dashboard');
+      router.push('/');
     } catch (error: any) {
       setError(error.message || "An error occurred during sign in.");
       setLoading(false);

@@ -58,7 +58,7 @@ export default function DashboardPage() {
             <CardHeader className="text-center">
               <CardTitle className="text-2xl">Complete Your Profile</CardTitle>
               <CardDescription>
-                Select how you'll primarily use Art Realm to personalize your dashboard
+                Select how you'll primarily use Kala Hive to personalize your dashboard
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col items-center gap-6">

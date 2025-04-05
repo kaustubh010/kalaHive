@@ -339,7 +339,7 @@ export function BuyerDashboard({ profile }: BuyerDashboardProps) {
             <CardHeader>
               <CardTitle>Recent Activity</CardTitle>
               <CardDescription>
-                Your recent interactions on Art Realm
+                Your recent interactions on Kala Hive
               </CardDescription>
             </CardHeader>
             <CardContent>

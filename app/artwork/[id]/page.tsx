@@ -93,15 +93,15 @@ export default function ArtworkPage({ params }: { params: Promise<{ id: string }
 
   // Get artist initials for avatar fallback
   const getArtistInitials = () => {
-    if (artwork?.profiles.fullName) {
+    if (artwork?.profiles?.fullName) {
       return artwork.profiles.fullName
         .split(" ")
-        .map((n) => n[0])
+        .map((n: any) => n[0])
         .join("")
         .toUpperCase()
         .substring(0, 2);
     }
-    return "AR"; // Art Realm default
+    return "KH"; // Kala Hive default
   };
 
   if (error) {

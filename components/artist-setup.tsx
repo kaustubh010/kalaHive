@@ -125,7 +125,7 @@ export default function ArtistSetup() {
         .eq("id", user.id);
 
       if (updateError) throw updateError;
-      router.push("/dashboard");
+      router.push("/");
     } catch (err: any) {
       console.error("Error skipping setup:", err);
       setError(err.message);
@@ -221,7 +221,7 @@ export default function ArtistSetup() {
         await Promise.all(artworkPromises);
       }
 
-      router.push("/dashboard");
+      router.push("/");
     } catch (err: any) {
       console.error("Error setting up artist profile:", err);
       setError(err.message || "An error occurred while setting up your profile");

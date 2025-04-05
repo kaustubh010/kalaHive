@@ -41,7 +41,7 @@ export async function GET(request: Request) {
         
         // If profile exists and onboarding is completed, redirect to dashboard
         console.log('Redirecting to dashboard: Existing user with completed onboarding');
-        return NextResponse.redirect(new URL('/dashboard', requestUrl.origin));
+        return NextResponse.redirect(new URL('/', requestUrl.origin));
       }
     } catch (error) {
       console.error('Error in auth callback:', error);

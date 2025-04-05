@@ -124,7 +124,7 @@ export function BuyerSetup() {
 
       if (updateError) throw updateError
 
-      router.push("/dashboard")
+      router.push("/")
     } catch (err: any) {
       console.error("Error setting up buyer profile:", err)
       setError(err.message || "An error occurred while setting up your profile")
@@ -150,7 +150,7 @@ export function BuyerSetup() {
         .eq("id", user.id)
 
       if (updateError) throw updateError
-      router.push("/dashboard")
+      router.push("/")
     } catch (err: any) {
       console.error("Error skipping setup:", err)
       setError(err.message)
