@@ -4,6 +4,7 @@ import { ReactNode, useEffect, useState } from "react";
 import { Navbar } from "@/components/navbar";
 import { useAuth } from "@/hooks/use-auth";
 import { LoadingSkeleton } from "@/components/loading-skeleton";
+import { Footer } from "./footer";
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -27,6 +28,8 @@ export function MainLayout({ children }: MainLayoutProps) {
     <div className="flex min-h-screen flex-col">
       <Navbar />
       <main className="flex-1 pt-2">{children}</main>
+
+      <Footer />
     </div>
   );
 } 

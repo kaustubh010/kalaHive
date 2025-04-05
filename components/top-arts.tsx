@@ -24,7 +24,6 @@ export function TopArts() {
           limit: 6,
           sortBy: "view_count",
           sortOrder: "desc",
-          featured: true
         })
         
         if (error) {
