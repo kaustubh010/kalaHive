@@ -18,11 +18,10 @@ import {
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import { supabase } from "@/utils/supabase/client";
 
 export function LoginForm() {
   const router = useRouter();
-  const { signIn, signInWithGoogle } = useAuth();
+  const { login, signInWithGoogle } = useAuth();
   
   const [formData, setFormData] = useState({
     email: "",
@@ -47,31 +46,11 @@ export function LoginForm() {
     setLoading(true);
     
     try {
-      const { error } = await signIn(formData.email, formData.password);
+      const { error } = await login(formData.email, formData.password);
       
       if (error) throw new Error(error.message);
       
-      // Check if the user has completed onboarding
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (user) {
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('onboardingCompleted')
-          .eq('id', user.id)
-          .single();
-          
-        if (!profileError && profile) {
-          if (profile.onboardingCompleted === false) {
-            // Redirect to onboarding if not completed
-            router.push('/onboarding/user-type');
-            return;
-          }
-        }
-      }
-      
-      // Redirect to dashboard if onboarding is completed
-      router.push('/');
+      router.push('/dashboard');
     } catch (error: any) {
       setError(error.message || "An error occurred during sign in.");
       setLoading(false);
@@ -86,8 +65,7 @@ export function LoginForm() {
       const { error } = await signInWithGoogle();
       
       if (error) throw new Error(error.message);
-      // Google sign-in will redirect to the auth callback route
-      // which will handle the redirection to onboarding or dashboard
+      
     } catch (error: any) {
       setError(error.message || "An error occurred during Google sign in.");
       setLoading(false);

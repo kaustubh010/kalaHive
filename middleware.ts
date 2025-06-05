@@ -1,19 +1,27 @@
-import { type NextRequest } from 'next/server'
-import { updateSession } from '@/utils/supabase/middleware'
+import { withAuth } from "next-auth/middleware";
+import { NextResponse } from "next/server";
 
-export async function middleware(request: NextRequest) {
-  return await updateSession(request)
-}
+// Optional: redirect users to login if not authenticated
+export default withAuth(
+  function middleware(req) {
+    // Example: You can add custom logic here if needed
+    return NextResponse.next();
+  },
+  {
+    callbacks: {
+      authorized: ({ token }) => !!token, // Only allow access if logged in
+    },
+  }
+);
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - Public pages like home, login, and signup
-     */
-    '/((?!_next/static|_next/image|favicon.ico|login|signup|artist|artwork|explore|$|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    "/dashboard/:path*",       // protect dashboard
+    "/onboarding/:path*",      // protect onboarding
+    "/profile/:path*",         // protect profile
+    "/settings/:path*",
+    "/upload/:path*",
+    "/notifications/:path*",
+    // Exclude public stuff (login, signup, etc.)
   ],
-}
+};

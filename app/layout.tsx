@@ -2,8 +2,8 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Playfair_Display, Inter } from "next/font/google"
 import "./globals.css"
+import { AuthProvider } from "@/components/session-provider";
 import { ThemeProvider } from "@/components/theme-provider"
-import { AuthProvider } from "@/hooks/use-auth"
 
 const playfair = Playfair_Display({
   subsets: ["latin"],

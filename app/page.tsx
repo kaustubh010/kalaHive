@@ -13,7 +13,7 @@ export default function Home() {
       <main className="flex-grow">
         <ArtisticHero />
         <div className="container py-16 space-y-24">
-          <TopArts />
+          {/* <TopArts /> */}
           <PlatformSection />
         </div>
       </main>

@@ -20,15 +20,15 @@ import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/s
 
 export function Navbar() {
   const router = useRouter();
-  const { user, profile, signOut, loading } = useAuth();
+  const { user, profile, logout, loading } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleSignOut = async () => {
     // Redirect immediately for better UX
-    router.push("/login");
+    router.push("/auth/login");
     
     // Then perform the actual signout
-    await signOut();
+    await logout();
   };
 
   // Get user initials for avatar fallback
