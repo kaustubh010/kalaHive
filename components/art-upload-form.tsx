@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
-import { uploadArtworkImage, createArtwork } from "@/utils/artwork";
+// import { uploadArtworkImage, createArtwork } from "@/utils/artwork";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -127,86 +127,87 @@ export function ArtUploadForm() {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
+  //   e.preventDefault();
+  //   setError(null);
 
-    if (!user) {
-      setError("You must be logged in to upload artwork");
-      return;
-    }
+  //   if (!user) {
+  //     setError("You must be logged in to upload artwork");
+  //     return;
+  //   }
 
-    if (!selectedFile) {
-      setError("Please select an image to upload");
-      return;
-    }
+  //   if (!selectedFile) {
+  //     setError("Please select an image to upload");
+  //     return;
+  //   }
 
-    if (!formData.title) {
-      setError("Please enter a title for your artwork");
-      return;
-    }
+  //   if (!formData.title) {
+  //     setError("Please enter a title for your artwork");
+  //     return;
+  //   }
 
-    // Show immediate success feedback
-    setSuccess(true);
+  //   // Show immediate success feedback
+  //   setSuccess(true);
     
-    // Reset form immediately for better UX
-    const tempFormData = { ...formData };
-    const tempFile = selectedFile;
+  //   // Reset form immediately for better UX
+  //   const tempFormData = { ...formData };
+  //   const tempFile = selectedFile;
     
-    setFormData({
-      title: "",
-      description: "",
-      category: "",
-      tags: "",
-    });
-    clearSelectedFile();
+  //   setFormData({
+  //     title: "",
+  //     description: "",
+  //     category: "",
+  //     tags: "",
+  //   });
+  //   clearSelectedFile();
 
-    try {
-      // Upload the image to Supabase Storage
-      const { path: imageUrl, error: uploadError } = await uploadArtworkImage(
-        tempFile,
-        user.id
-      );
+  //   try {
+  //     // Upload the image to Supabase Storage
+  //     const { path: imageUrl, error: uploadError } = await uploadArtworkImage(
+  //       tempFile,
+  //       user.id
+  //     );
 
-      if (uploadError) {
-        throw new Error("Error uploading image: " + uploadError.message);
-      }
+  //     if (uploadError) {
+  //       throw new Error("Error uploading image: " + uploadError.message);
+  //     }
 
-      // Process tags
-      const tags = tempFormData.tags
-        .split(",")
-        .map((tag) => tag.trim())
-        .filter((tag) => tag.length > 0);
+  //     // Process tags
+  //     const tags = tempFormData.tags
+  //       .split(",")
+  //       .map((tag) => tag.trim())
+  //       .filter((tag) => tag.length > 0);
 
-      // Create the artwork entry in the database
-      const { artwork, error: createError } = await createArtwork({
-        title: tempFormData.title,
-        description: tempFormData.description,
-        artist_id: user.id,
-        image_url: imageUrl,
-        thumbnail_url: imageUrl, // For now, use the same URL for thumbnail
-        category: tempFormData.category || null,
-        tags: tags.length > 0 ? tags : null,
-      });
+  //     // Create the artwork entry in the database
+  //     const { artwork, error: createError } = await createArtwork({
+  //       title: tempFormData.title,
+  //       description: tempFormData.description,
+  //       artist_id: user.id,
+  //       image_url: imageUrl,
+  //       thumbnail_url: imageUrl, // For now, use the same URL for thumbnail
+  //       category: tempFormData.category || null,
+  //       tags: tags.length > 0 ? tags : null,
+  //     });
 
-      if (createError) {
-        throw new Error("Error creating artwork: " + createError.message);
-      }
+  //     if (createError) {
+  //       throw new Error("Error creating artwork: " + createError.message);
+  //     }
 
-      // Redirect to the artwork page after a short delay
-      setTimeout(() => {
-        router.push(`/artwork/${artwork?.id}`);
-      }, 1500);
-    } catch (error: any) {
-      setSuccess(false);
-      setError(error.message || "An error occurred while uploading your artwork");
+  //     // Redirect to the artwork page after a short delay
+  //     setTimeout(() => {
+  //       router.push(`/artwork/${artwork?.id}`);
+  //     }, 1500);
+  //   } catch (error: any) {
+  //     setSuccess(false);
+  //     setError(error.message || "An error occurred while uploading your artwork");
       
-      // Restore form data if there was an error
-      setFormData(tempFormData);
-      setSelectedFile(tempFile);
-      if (tempFile) {
-        setPreviewUrl(URL.createObjectURL(tempFile));
-      }
-    }
+  //     // Restore form data if there was an error
+  //     setFormData(tempFormData);
+  //     setSelectedFile(tempFile);
+  //     if (tempFile) {
+  //       setPreviewUrl(URL.createObjectURL(tempFile));
+  //     }
+  //   }
+  return
   };
 
   return (

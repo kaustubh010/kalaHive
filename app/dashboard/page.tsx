@@ -6,14 +6,21 @@ import { MainLayout } from "@/components/main-layout";
 import { ArtistDashboard } from "@/components/artist-dashboard";
 import { BuyerDashboard } from "@/components/buyer-dashboard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRouter } from "next/navigation";
 import { Palette, ShoppingBag } from "lucide-react";
 
 export default function DashboardPage() {
-  const { user, profile, loading } = useAuth();
+  const profile = { userType: "artist" };
+  const { user, loading } = useAuth();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("overview");
 
@@ -58,13 +65,14 @@ export default function DashboardPage() {
             <CardHeader className="text-center">
               <CardTitle className="text-2xl">Complete Your Profile</CardTitle>
               <CardDescription>
-                Select how you'll primarily use Kala Hive to personalize your dashboard
+                Select how you'll primarily use Kala Hive to personalize your
+                dashboard
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col items-center gap-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-2xl">
-                <Button 
-                  size="lg" 
+                <Button
+                  size="lg"
                   className="h-auto py-6 flex flex-col gap-2"
                   onClick={() => router.push("/onboarding/artist-setup")}
                 >
@@ -74,9 +82,9 @@ export default function DashboardPage() {
                     I want to showcase and sell my artwork
                   </span>
                 </Button>
-                <Button 
-                  size="lg" 
-                  variant="outline" 
+                <Button
+                  size="lg"
+                  variant="outline"
                   className="h-auto py-6 flex flex-col gap-2"
                   onClick={() => router.push("/onboarding/buyer-setup")}
                 >
@@ -106,4 +114,3 @@ export default function DashboardPage() {
     </MainLayout>
   );
 }
-

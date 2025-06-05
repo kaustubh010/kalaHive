@@ -1,4 +1,4 @@
-import { BuyerSetup } from "@/components/buyer-setup"
+// import { BuyerSetup } from "@/components/buyer-setup"
 import { OnboardingProgress } from "@/components/onboarding-progress"
 
 export default function BuyerSetupPage() {
@@ -8,7 +8,7 @@ export default function BuyerSetupPage() {
         <OnboardingProgress currentStep={2} totalSteps={3} />
       </div>
       <div className="flex-1 flex items-center justify-center p-4">
-        <BuyerSetup />
+        {/* <BuyerSetup /> */}
       </div>
     </div>
   )

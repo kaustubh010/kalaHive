@@ -1,4 +1,4 @@
-import { UserTypeSelection } from "@/components/user-type-selection"
+// import { UserTypeSelection } from "@/components/user-type-selection"
 import { OnboardingProgress } from "@/components/onboarding-progress"
 
 export default function UserTypePage() {
@@ -8,7 +8,7 @@ export default function UserTypePage() {
         <OnboardingProgress currentStep={1} totalSteps={5} />
       </div>
       <div className="flex-1 flex items-center justify-center p-4">
-        <UserTypeSelection />
+        {/* <UserTypeSelection /> */}
       </div>
     </div>
   )

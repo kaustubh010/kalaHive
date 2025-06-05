@@ -1,19 +1,18 @@
 "use client";
 
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useAuth } from "@/hooks/use-auth";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 export default function ProfilePage() {
-  const session = useSession();
+  const {user} = useAuth();
   const router = useRouter();
-  const supabase = useSupabaseClient();
 
   useEffect(() => {
-    if (!session) {
+    if (!user) {
       router.push("/login");
     }
-  }, [session, router]);
+  }, [user, router]);
 
-  return session ? <div>Welcome, {session.user.email}</div> : null;
+  return user ? <div>Welcome, {user.email}</div> : null;
 }

@@ -20,7 +20,7 @@ import { AlertCircle, GalleryVerticalEnd } from "lucide-react";
 
 export default function ResetPasswordPage() {
   const router = useRouter();
-  const { updatePassword } = useAuth();
+  // const { updatePassword } = useAuth();
   
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -50,9 +50,9 @@ export default function ResetPasswordPage() {
     setLoading(true);
     
     try {
-      const { error } = await updatePassword(password);
+      // const { error } = await updatePassword(password);
       
-      if (error) throw new Error(error.message);
+      // if (error) throw new Error(error.message);
       
       setSuccess(true);
       

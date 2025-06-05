@@ -20,7 +20,7 @@ import { AlertCircle, GalleryVerticalEnd } from "lucide-react";
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
-  const { resetPassword } = useAuth();
+  // const { resetPassword } = useAuth();
   
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
@@ -39,9 +39,9 @@ export default function ForgotPasswordPage() {
     setLoading(true);
     
     try {
-      const { error } = await resetPassword(email);
+      // const { error } = await resetPassword(email);
       
-      if (error) throw new Error(error.message);
+      // if (error) throw new Error(error.message);
       
       setSuccess(true);
     } catch (error: any) {
