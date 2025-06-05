@@ -1,4 +1,3 @@
-// hooks/useUser.ts
 "use client";
 
 import { useSession, signIn, signOut } from "next-auth/react";
@@ -10,6 +9,17 @@ export const useAuth = () => {
 
   const loading = status === "loading";
   const loggedIn = !!session?.user;
+
+  const user = session?.user
+    ? {
+        id: (session.user as any).id,
+        name: session.user.name,
+        email: session.user.email,
+        image: session.user.image,
+      }
+    : null;
+
+  const profile = session?.user?.profile ?? null;
 
   const login = async (email: string, password: string) => {
     return await signIn("credentials", {
@@ -33,7 +43,8 @@ export const useAuth = () => {
   return {
     loading,
     loggedIn,
-    user: session?.user ?? null,
+    user,     // auth-related
+    profile,  // db-related
     session,
     status,
     login,

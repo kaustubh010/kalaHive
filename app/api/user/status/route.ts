@@ -9,10 +9,10 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
-    select: { onboardingComplete: true },
+  const user = await prisma.profile.findUnique({
+    where: { userId: session.user.id },
+    select: { onboardingCompleted: true },
   });
 
-  return NextResponse.json({ onboardingComplete: user?.onboardingComplete || false });
+  return NextResponse.json({ onboardingCompleted: user?.onboardingCompleted || false });
 }

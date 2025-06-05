@@ -20,12 +20,82 @@ model User {
   emailVerified     DateTime?
   image             String?
   hashedPassword    String?
-  onboardingComplete Boolean @default(false)
-  interests String[]
-
+  
   accounts          Account[]
   sessions          Session[]
+  
+  profile           Profile?  @relation("UserProfile")
+  
+  artworks          Artwork[]     @relation("UserArtworks")
+  likes             ArtworkLike[] @relation("UserLikes")
+  views             ArtworkView[] @relation("UserViews")
 }
+
+model Profile {
+  id                  String   @id @default(cuid())
+  userId              String   @unique
+  user                User     @relation("UserProfile", fields: [userId], references: [id])
+
+  userName            String?
+  fullName            String?
+  profileImage        String?
+  coverImage          String?
+  name                String?
+  bio                 String?
+  email               String?
+  location            String?
+  website             String?
+  contactPreference   String?
+  customContactInfo   String?
+  artistStatement     String?
+  preferences         String?
+  userType            String?
+  onboardingCompleted Boolean  @default(false)
+  updatedAt           DateTime @updatedAt
+  createdAt           DateTime @default(now())
+}
+
+
+model Artwork {
+  id            String   @id @default(cuid())
+  title         String
+  description   String?
+  artist        User     @relation("UserArtworks", fields: [artistId], references: [id])
+  artistId      String
+  imageUrl      String
+  thumbnailUrl  String?
+  category      String?
+  tags          String[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  viewCount     Int      @default(0)
+  likeCount     Int      @default(0)
+  isFeatured    Boolean  @default(false)
+
+  likes         ArtworkLike[]
+  views         ArtworkView[]
+}
+
+model ArtworkLike {
+  id         String   @id @default(cuid())
+  user       User     @relation("UserLikes", fields: [userId], references: [id])
+  userId     String
+  artwork    Artwork  @relation(fields: [artworkId], references: [id])
+  artworkId  String
+
+  @@unique([userId, artworkId])
+}
+
+model ArtworkView {
+  id         String   @id @default(cuid())
+  user       User?    @relation("UserViews", fields: [userId], references: [id])
+  userId     String?
+  artwork    Artwork  @relation(fields: [artworkId], references: [id])
+  artworkId  String
+
+  viewedAt   DateTime @default(now())
+}
+
 
 model Account {
   id                String  @id @default(cuid())

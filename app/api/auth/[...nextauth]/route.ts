@@ -42,14 +42,36 @@ export const authOptions = {
     error: "/auth/error",
     newUser: "/onboarding",
   },
-  callbacks: {
-    async session({ session, token }) {
-      if (session?.user) {
-        session.user.id = token.sub;
-      }
-      return session;
-    },
+callbacks: {
+  async jwt({ token, user }) {
+    // First time JWT is created, attach user info
+    if (user) {
+      token.id = user.id;
+      token.email = user.email;
+      token.name = user.name;
+      token.image = user.image;
+    }
+    return token;
   },
+  async session({ session, token }) {
+    if (session.user && token?.id) {
+      const dbUser = await prisma.user.findUnique({
+        where: { id: token.id as string },
+        include: { profile: true },
+      });
+
+      if (dbUser) {
+        session.user.id = dbUser.id;
+        session.user.name = dbUser.name;
+        session.user.email = dbUser.email;
+        session.user.image = dbUser.image;
+        session.user.profile = dbUser.profile; // include full profile
+      }
+    }
+
+    return session;
+  },
+}
 };
 
 const handler = NextAuth(authOptions);
