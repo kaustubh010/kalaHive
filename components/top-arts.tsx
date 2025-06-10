@@ -5,35 +5,51 @@ import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, ChevronLeft, ChevronRight, Heart, Eye } from "lucide-react"
-import { getArtworks } from "@/utils/artwork"
-import type { ArtworkWithArtist } from "@/utils/artwork"
+// import { getArtworks } from "@/utils/artwork"; // Removed
+// import type { ArtworkWithArtist } from "@/utils/artwork"; // Removed
+
+// Define a local type for artwork, assuming structure from API
+interface ArtworkType {
+  id: string;
+  title: string;
+  imageUrl: string;
+  category?: string;
+  viewCount: number;
+  likeCount: number;
+  artist: {
+    name?: string | null;
+    // Add other artist fields if needed
+  };
+  // Add other fields if necessary
+}
 
 export function TopArts() {
-  const [artworks, setArtworks] = useState<ArtworkWithArtist[]>([])
+  const [artworks, setArtworks] = useState<ArtworkType[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     async function fetchFeaturedArtworks() {
-      setLoading(true)
-      setError(null)
+      setLoading(true);
+      setError(null);
       
       try {
-        // Fetch featured artworks with higher view count
-        const { artworks: fetchedArtworks, error } = await getArtworks({
-          limit: 6,
-          sortBy: "view_count",
-          sortOrder: "desc",
-        })
-        
-        if (error) {
-          throw new Error(error.message || "Failed to fetch artworks")
+        const res = await fetch("/api/artworks");
+        if (!res.ok) {
+          const errorData = await res.json().catch(() => ({}));
+          throw new Error(
+            errorData.error || `Failed to fetch artworks: ${res.status}`
+          );
         }
+        let fetchedArtworks: ArtworkType[] = await res.json();
         
-        setArtworks(fetchedArtworks)
+        // Sort by viewCount (descending) and then limit to 6
+        fetchedArtworks.sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0));
+        setArtworks(fetchedArtworks.slice(0, 6));
+
       } catch (err: any) {
-        console.error("Error fetching top artworks:", err)
-        setError(err.message || "Failed to load top artworks")
+        console.error("Error fetching top artworks:", err);
+        setError(err.message || "Failed to load top artworks");
       } finally {
         setLoading(false)
       }
@@ -105,7 +121,7 @@ export function TopArts() {
               <div className="bg-background/80 backdrop-blur-md rounded-lg border border-border/50 overflow-hidden h-full">
                 <div className="aspect-[4/3] relative overflow-hidden">
                   <Image
-                    src={artwork.image_url || "/placeholder.svg"}
+                    src={artwork.imageUrl || "/placeholder.svg"}
                     alt={artwork.title}
                     fill
                     className="object-cover transition-transform hover:scale-105 duration-300"
@@ -113,15 +129,15 @@ export function TopArts() {
                 </div>
                 <div className="p-4">
                   <h3 className="font-bold text-lg line-clamp-1">{artwork.title}</h3>
-                  <p className="text-sm text-muted-foreground">{artwork.category}</p>
+                  <p className="text-sm text-muted-foreground">{artwork.category || "N/A"}</p>
                   <div className="flex items-center justify-between mt-3">
-                    <span className="text-sm">By {artwork.profiles.fullName}</span>
+                    <span className="text-sm">By {artwork.artist?.name || "Unknown Artist"}</span>
                     <div className="flex items-center gap-3">
                       <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                        <Eye className="h-3 w-3" /> {artwork.view_count}
+                        <Eye className="h-3 w-3" /> {artwork.viewCount || 0}
                       </div>
                       <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                        <Heart className="h-3 w-3" /> {artwork.like_count}
+                        <Heart className="h-3 w-3" /> {artwork.likeCount || 0}
                       </div>
                     </div>
                   </div>

@@ -30,50 +30,66 @@ export default function ArtworkPage({
 
   // Fetch artwork data
   useEffect(() => {
-    const fetchArtwork = async () => {
+    const fetchArtworkAndInteractions = async () => {
       setError(null);
+      if (!resolvedParams.id) return;
 
       try {
-        const { artwork: fetchedArtwork, error } = await fetch("/api/artwork", {
-          method: "POST",
-          body: resolvedParams.id,
-        });
-
-        if (error) {
-          console.error("Error fetching artwork:", error);
-          throw new Error(error.message || "Failed to fetch artwork");
+        // Fetch artwork data
+        const artworkRes = await fetch(`/api/artworks/${resolvedParams.id}`);
+        if (!artworkRes.ok) {
+          const errorData = await artworkRes.json().catch(() => ({}));
+          throw new Error(
+            errorData.error || `Failed to fetch artwork: ${artworkRes.status}`
+          );
         }
+        const fetchedArtwork = await artworkRes.json();
 
         if (!fetchedArtwork) {
           throw new Error("Artwork not found");
         }
 
         setArtwork(fetchedArtwork);
-        setLikeCount(fetchedArtwork.likeCount);
+        setLikeCount(fetchedArtwork.likeCount || 0); // Ensure likeCount is a number
+
+        // Record a view - fire and forget
+        fetch(`/api/artworks/${resolvedParams.id}/view`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userId: user?.id }), // Send userId if available
+        }).catch((viewError) =>
+          console.warn("Failed to record view:", viewError)
+        );
 
         // Check if the user has liked this artwork
-        if (user) {
-          const { liked: hasLiked } = await hasUserLikedArtwork(
-            fetchedArtwork.id,
-            user.id
+        if (user && fetchedArtwork.id) {
+          setIsLikeLoading(true);
+          const likeStatusRes = await fetch(
+            `/api/artworks/${fetchedArtwork.id}/like?userId=${user.id}`
           );
-          setLiked(hasLiked);
+          if (likeStatusRes.ok) {
+            const { liked: hasLiked } = await likeStatusRes.json();
+            setLiked(hasLiked);
+          } else {
+            console.warn("Failed to fetch like status:", await likeStatusRes.text());
+          }
+          setIsLikeLoading(false);
         }
       } catch (err: any) {
-        console.error("Error fetching artwork:", err);
+        console.error("Error in fetchArtworkAndInteractions:", err);
         setError(
           err.message || "Failed to load artwork. Please try again later."
         );
       }
     };
 
-    fetchArtwork();
+    fetchArtworkAndInteractions();
   }, [resolvedParams.id, user]);
 
   // Handle like button click
   const handleLikeClick = async () => {
     if (!user) {
-      router.push("/login");
+      router.push("/login"); // Redirect to login if not authenticated
       return;
     }
 
@@ -81,11 +97,25 @@ export default function ArtworkPage({
 
     setIsLikeLoading(true);
     try {
-      const { liked: newLikedStatus } = await toggleArtworkLike(artwork.id);
+      const res = await fetch(`/api/artworks/${artwork.id}/like`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: user.id }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || "Failed to toggle like");
+      }
+
+      const { liked: newLikedStatus } = await res.json();
       setLiked(newLikedStatus);
-      setLikeCount((prev) => (newLikedStatus ? prev + 1 : prev - 1));
-    } catch (error) {
+      setLikeCount((prev) =>
+        newLikedStatus ? (prev || 0) + 1 : Math.max(0, (prev || 0) - 1)
+      );
+    } catch (error: any) {
       console.error("Error toggling like:", error);
+      // Potentially show a toast or error message to the user
     } finally {
       setIsLikeLoading(false);
     }
@@ -103,8 +133,8 @@ export default function ArtworkPage({
 
   // Get artist initials for avatar fallback
   const getArtistInitials = () => {
-    if (artwork?.profiles?.fullName) {
-      return artwork.profiles.fullName
+    if (artwork?.artist?.name) {
+      return artwork.artist.name
         .split(" ")
         .map((n: any) => n[0])
         .join("")
@@ -194,7 +224,7 @@ export default function ArtworkPage({
           {/* Artwork Image */}
           <div className="relative aspect-square overflow-hidden rounded-lg">
             <Image
-              src={artwork.image_url}
+              src={artwork.imageUrl}
               alt={artwork.title}
               fill
               sizes="(max-width: 768px) 100vw, 50vw"
@@ -209,21 +239,23 @@ export default function ArtworkPage({
 
             {/* Artist Info */}
             <Link
-              href={`/artist/${artwork.profiles.userName}`}
+              href={`/artist/${artwork.artist?.username || artwork.artist?.id}`} // Fallback to id if username not present
               className="flex items-center gap-3 mt-4 mb-6 hover:text-primary transition-colors"
             >
               <Avatar className="h-10 w-10">
                 <AvatarImage
-                  src={artwork.profiles.profileImage || ""}
-                  alt={artwork.profiles.fullName || "Artist"}
+                  src={artwork.artist?.image || ""}
+                  alt={artwork.artist?.name || "Artist"}
                 />
                 <AvatarFallback>{getArtistInitials()}</AvatarFallback>
               </Avatar>
               <div>
-                <p className="font-medium">{artwork.profiles.fullName}</p>
-                <p className="text-sm text-muted-foreground">
-                  @{artwork.profiles.userName}
-                </p>
+                <p className="font-medium">{artwork.artist?.name || "Unknown Artist"}</p>
+                {artwork.artist?.username && (
+                  <p className="text-sm text-muted-foreground">
+                    @{artwork.artist.username}
+                  </p>
+                )}
               </div>
             </Link>
 
@@ -233,7 +265,7 @@ export default function ArtworkPage({
             <div className="flex gap-6 mb-6">
               <div className="flex items-center gap-2">
                 <Eye className="h-5 w-5 text-muted-foreground" />
-                <span>{artwork.view_count} views</span>
+                <span>{artwork.viewCount || 0} views</span>
               </div>
               <div className="flex items-center gap-2">
                 <Button
@@ -254,7 +286,7 @@ export default function ArtworkPage({
               </div>
               <div className="flex items-center gap-2">
                 <Calendar className="h-5 w-5 text-muted-foreground" />
-                <span>{formatDate(artwork.created_at)}</span>
+                <span>{artwork.createdAt ? formatDate(artwork.createdAt) : "N/A"}</span>
               </div>
             </div>
 

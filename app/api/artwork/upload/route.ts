@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { uploadArtworkImage, createArtworkEntry } from "@/utils/artwork";
+import { uploadArtworkImage } from "@/utils/artwork";
+import { prisma } from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -38,14 +39,17 @@ export async function POST(req: NextRequest) {
       : [];
 
     // Save artwork in DB
-    const artwork = await createArtworkEntry({
-      artistId: session.user.id,
-      title,
-      description,
-      imageUrl,
-      thumbnailUrl: imageUrl,
-      category,
-      tags,
+    const artwork = await prisma.artwork.create({
+      data: {
+        artistId: session.user.id,
+        title,
+        description: description || "",
+        imageUrl,
+        thumbnailUrl: imageUrl, // Using imageUrl as thumbnail by default
+        category,
+        tags,
+        // isFeatured will default to false as per schema, if not provided
+      },
     });
 
     return NextResponse.json(artwork, { status: 201 });
