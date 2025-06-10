@@ -127,87 +127,45 @@ export function ArtUploadForm() {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   setError(null);
+    e.preventDefault();
+    setError(null);
 
-  //   if (!user) {
-  //     setError("You must be logged in to upload artwork");
-  //     return;
-  //   }
+    if (!user) return setError("You must be logged in to upload artwork");
+    if (!selectedFile) return setError("Please select an image to upload");
+    if (!formData.title) return setError("Please enter a title");
 
-  //   if (!selectedFile) {
-  //     setError("Please select an image to upload");
-  //     return;
-  //   }
+    setSuccess(true);
 
-  //   if (!formData.title) {
-  //     setError("Please enter a title for your artwork");
-  //     return;
-  //   }
+    const tempFormData = { ...formData };
+    const tempFile = selectedFile;
 
-  //   // Show immediate success feedback
-  //   setSuccess(true);
-    
-  //   // Reset form immediately for better UX
-  //   const tempFormData = { ...formData };
-  //   const tempFile = selectedFile;
-    
-  //   setFormData({
-  //     title: "",
-  //     description: "",
-  //     category: "",
-  //     tags: "",
-  //   });
-  //   clearSelectedFile();
+    setFormData({ title: "", description: "", category: "", tags: "" });
+    clearSelectedFile();
 
-  //   try {
-  //     // Upload the image to Supabase Storage
-  //     const { path: imageUrl, error: uploadError } = await uploadArtworkImage(
-  //       tempFile,
-  //       user.id
-  //     );
+    try {
+      const formPayload = new FormData();
+      formPayload.append("image", tempFile);
+      formPayload.append("title", tempFormData.title);
+      formPayload.append("description", tempFormData.description);
+      formPayload.append("category", tempFormData.category);
+      formPayload.append("tags", tempFormData.tags);
 
-  //     if (uploadError) {
-  //       throw new Error("Error uploading image: " + uploadError.message);
-  //     }
+      const res = await fetch("/api/artwork/upload", {
+        method: "POST",
+        body: formPayload,
+      });
 
-  //     // Process tags
-  //     const tags = tempFormData.tags
-  //       .split(",")
-  //       .map((tag) => tag.trim())
-  //       .filter((tag) => tag.length > 0);
+      if (!res.ok) throw new Error("Upload failed");
 
-  //     // Create the artwork entry in the database
-  //     const { artwork, error: createError } = await createArtwork({
-  //       title: tempFormData.title,
-  //       description: tempFormData.description,
-  //       artist_id: user.id,
-  //       image_url: imageUrl,
-  //       thumbnail_url: imageUrl, // For now, use the same URL for thumbnail
-  //       category: tempFormData.category || null,
-  //       tags: tags.length > 0 ? tags : null,
-  //     });
-
-  //     if (createError) {
-  //       throw new Error("Error creating artwork: " + createError.message);
-  //     }
-
-  //     // Redirect to the artwork page after a short delay
-  //     setTimeout(() => {
-  //       router.push(`/artwork/${artwork?.id}`);
-  //     }, 1500);
-  //   } catch (error: any) {
-  //     setSuccess(false);
-  //     setError(error.message || "An error occurred while uploading your artwork");
-      
-  //     // Restore form data if there was an error
-  //     setFormData(tempFormData);
-  //     setSelectedFile(tempFile);
-  //     if (tempFile) {
-  //       setPreviewUrl(URL.createObjectURL(tempFile));
-  //     }
-  //   }
-  return
+      const artwork = await res.json();
+      router.push(`/artwork/${artwork.id}`);
+    } catch (err: any) {
+      setSuccess(false);
+      setError(err.message || "An error occurred");
+      setFormData(tempFormData);
+      setSelectedFile(tempFile);
+      setPreviewUrl(URL.createObjectURL(tempFile));
+    }
   };
 
   return (
@@ -232,7 +190,8 @@ export function ArtUploadForm() {
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>Success</AlertTitle>
             <AlertDescription>
-              Your artwork has been uploaded successfully! Redirecting to your artwork page...
+              Your artwork has been uploaded successfully! Redirecting to your
+              artwork page...
             </AlertDescription>
           </Alert>
         )}
@@ -358,11 +317,7 @@ export function ArtUploadForm() {
             </p>
           </div>
 
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={success}
-          >
+          <Button type="submit" className="w-full" disabled={success}>
             {success ? (
               <>
                 <span className="mr-2">✓</span> Artwork Uploaded Successfully
@@ -377,4 +332,4 @@ export function ArtUploadForm() {
       </CardContent>
     </Card>
   );
-} 
+}
